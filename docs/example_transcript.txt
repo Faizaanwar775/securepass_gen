@@ -1,0 +1,93 @@
+$ securepass-gen --help
+usage: securepass-gen [-h] [-l LENGTH] [--no-lowercase] [--no-uppercase]
+                      [--no-digits] [--no-symbols] [--exclude-ambiguous]
+                      [--count COUNT] [--output FILE] [--secure] [-v]
+
+SecurePass Gen -- a terminal-based password generator built entirely on the Python standard library.
+
+options:
+  -h, --help            show this help message and exit
+  -l LENGTH, --length LENGTH
+                        Password length, 16 by default (must be between 4 and
+                        128).
+  --no-lowercase        Exclude lowercase letters (a-z). Included by default.
+  --no-uppercase        Exclude uppercase letters (A-Z). Included by default.
+  --no-digits           Exclude digits (0-9). Included by default.
+  --no-symbols          Exclude punctuation/symbols. Included by default.
+  --exclude-ambiguous   Exclude visually ambiguous characters (0/O, 1/l/I).
+  --count COUNT         Number of passwords to generate, 1 by default.
+  --output FILE         Save generated password(s) to FILE, in addition to
+                        printing them.
+  --secure              Use the 'secrets' CSPRNG module instead of 'random'
+                        for character selection and shuffling. Recommended for
+                        any password you will actually use -- see README for
+                        why.
+  -v, --verbose         Enable debug logging to stderr (generated passwords
+                        are never logged).
+
+Examples:
+  securepass-gen -l 16
+  securepass-gen -l 20 --no-symbols --exclude-ambiguous
+  securepass-gen -l 24 --count 5 --secure
+  securepass-gen -l 16 --output passwords.txt
+
+$ securepass-gen                       # default run (length 16, all 4 classes)
+TX9<kT94eudv:gJ$
+
+$ securepass-gen -l 20 --no-symbols --exclude-ambiguous
+HTfSfAS5CCi4GySk9i32
+
+$ securepass-gen -l 24 --count 5 --secure
+1. 7}nJ5\4\2Ojl3"bY"C)Im]wY
+2. :95!wDc1y(*p,/wuuWMSXWs~
+3. *7ex/;iQB~^ka.@0Qlh67_["
+4. =8?@c{C2R6|LepZK8Wi1gL/&
+5. r.!c"xJF{bV07m}lN.I<bf%~
+
+$ securepass-gen -l 16 --output passwords.txt
+`7qy.7N)b.$2cd+a
+
+Saved 1 password(s) to passwords.txt
+
+$ cat passwords.txt
+`7qy.7N)b.$2cd+a
+
+$ securepass-gen --no-lowercase --no-uppercase --no-digits --no-symbols   # all classes disabled
+Error: All character classes are disabled -- enable at least one of lowercase, uppercase, digits, or symbols.
+exit code: 1
+
+$ securepass-gen -l 3                  # below the enforced minimum length of 4
+Error: Length must be between 4 and 128 (got 3).
+exit code: 1
+
+$ securepass-gen -l abc                # non-numeric length
+usage: securepass-gen [-h] [-l LENGTH] [--no-lowercase] [--no-uppercase]
+                      [--no-digits] [--no-symbols] [--exclude-ambiguous]
+                      [--count COUNT] [--output FILE] [--secure] [-v]
+securepass-gen: error: argument -l/--length: invalid int value: 'abc'
+exit code: 2
+
+# Too-short-for-enabled-classes path, demonstrated directly against the
+# pure generator function (see tests/test_generator.py for the automated
+# version of this exact scenario):
+$ python3 -c "from securepass.generator import PasswordOptions, generate_password; generate_password(PasswordOptions(length=3, min_length=1))"
+Error: Requested length 3 is too short to include at least one character from each of the 4 enabled class(es) (digits, lowercase, symbols, uppercase). Minimum required length is 4.
+
+$ python3 -m unittest discover -s tests -v
+test_all_classes_disabled_raises_clear_error (test_generator.TestAllClassesDisabled.test_all_classes_disabled_raises_clear_error) ... ok
+test_generate_multiple_rejects_non_positive_count (test_generator.TestBatchGeneration.test_generate_multiple_rejects_non_positive_count) ... ok
+test_generate_multiple_returns_requested_count (test_generator.TestBatchGeneration.test_generate_multiple_returns_requested_count) ... ok
+test_no_ambiguous_characters_appear_in_output (test_generator.TestExcludeAmbiguousCharacters.test_no_ambiguous_characters_appear_in_output) ... ok
+test_every_enabled_class_present_across_many_runs (test_generator.TestGuaranteedClassRepresentation.test_every_enabled_class_present_across_many_runs) ... ok
+test_guaranteed_characters_are_not_pinned_to_fixed_positions (test_generator.TestGuaranteedClassRepresentation.test_guaranteed_characters_are_not_pinned_to_fixed_positions) ... ok
+test_length_above_maximum_raises (test_generator.TestPasswordLengthCorrectness.test_length_above_maximum_raises) ... ok
+test_length_below_minimum_raises (test_generator.TestPasswordLengthCorrectness.test_length_below_minimum_raises) ... ok
+test_output_matches_requested_length (test_generator.TestPasswordLengthCorrectness.test_output_matches_requested_length) ... ok
+test_secure_flag_still_produces_a_valid_password (test_generator.TestSecureBackend.test_secure_flag_still_produces_a_valid_password) ... ok
+test_length_exactly_equal_to_class_count_succeeds (test_generator.TestTooShortForEnabledClasses.test_length_exactly_equal_to_class_count_succeeds) ... ok
+test_length_too_short_for_enabled_classes_raises (test_generator.TestTooShortForEnabledClasses.test_length_too_short_for_enabled_classes_raises) ... ok
+
+----------------------------------------------------------------------
+Ran 12 tests in 0.003s
+
+OK
