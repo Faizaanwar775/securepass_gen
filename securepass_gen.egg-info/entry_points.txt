@@ -1,0 +1,2 @@
+[console_scripts]
+securepass-gen = securepass.cli:main

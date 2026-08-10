@@ -1,0 +1,21 @@
+Metadata-Version: 2.4
+Name: securepass-gen
+Version: 1.0.0
+Summary: A terminal-based password generator built entirely on the Python standard library.
+Author: Khizex Python Engineering Internship -- Week 6
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Environment :: Console
+Classifier: Intended Audience :: Developers
+Classifier: Topic :: Security
+Classifier: Topic :: Utilities
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Dynamic: author
+Dynamic: classifier
+Dynamic: description-content-type
+Dynamic: license-file
+Dynamic: requires-python
+Dynamic: summary
